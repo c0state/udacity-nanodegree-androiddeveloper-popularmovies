@@ -12,19 +12,20 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 
+import com.google.common.collect.Lists;
 import com.squareup.picasso.Picasso;
-import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Movies;
+import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Movie;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.MoviesApi;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.MoviesApiHelpers;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
+import java.util.List;
 
-import static java.security.AccessController.getContext;
+import io.realm.Realm;
 
 public class MainActivityFragmentImageAdapter extends BaseAdapter {
     private Context mContext;
-    private Movies mMovies;
+    private List<Movie> mMovies;
     private GridView mGridView;
 
     public MainActivityFragmentImageAdapter(Context c, GridView g) {
@@ -33,52 +34,64 @@ public class MainActivityFragmentImageAdapter extends BaseAdapter {
         getMovies();
     }
 
-    public Movies movies() {
+    public List<Movie> movies() {
         return mMovies;
+    }
+
+    private String getSortOrderPref() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String sortPrefKey = mContext.getResources().getString(R.string.pref_movies_sort_order_key);
+        String sortPrefDefault = mContext.getResources().getString(R.string.pref_movies_sort_order_default);
+        return prefs.getString(sortPrefKey, sortPrefDefault);
     }
 
     private void getMovies() {
         final MoviesApi moviesApi = MoviesApiHelpers.getMoviesService();
         final ListAdapter thisAdapter = this;
 
-        new AsyncTask<Void, Void, Movies>() {
+        new AsyncTask<Void, Void, List<Movie>>() {
             @Override
-            protected Movies doInBackground(Void... params) {
+            protected List<Movie> doInBackground(Void... params) {
                 try {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-                    String sortPrefKey = mContext.getResources().getString(R.string.pref_movies_sort_order_key);
-                    String sortPrefDefault = mContext.getResources().getString(R.string.pref_movies_sort_order_default);
-                    String moviesSortOrder = prefs.getString(sortPrefKey, sortPrefDefault);
+                    String moviesSortOrder = getSortOrderPref();
 
-                    return moviesSortOrder.equals(sortPrefDefault)
-                            ? moviesApi.getPopularMovies(BuildConfig.THEMOVIESDB_API_KEY3, 1).execute().body()
-                            : moviesApi.getTopRatedMovies(BuildConfig.THEMOVIESDB_API_KEY3, 1).execute().body();
+                    if (mContext.getResources().getString(R.string.pref_movies_sort_order_popular).equals(moviesSortOrder)) {
+                        return moviesApi.getPopularMovies(BuildConfig.THEMOVIESDB_API_KEY3, 1).execute().body().listOfMovies;
+                    }
+                    else if (mContext.getResources().getString(R.string.pref_movies_sort_order_top_rated).equals(moviesSortOrder)) {
+                        return moviesApi.getTopRatedMovies(BuildConfig.THEMOVIESDB_API_KEY3, 1).execute().body().listOfMovies;
+                    }
                 }
                 catch (IOException ioe) {
-                    // TODO: pull error prefix from const strings xml
-                    Log.e("PopularMovies", "IO error calling popular movies API!");
+                    Log.e(getClass().getSimpleName(), "IO error calling popular movies API!");
                 }
                 return null;
             }
 
             @Override
-            protected void onPostExecute(Movies movies) {
+            protected void onPostExecute(List<Movie> movies) {
                 mMovies = movies;
+
+                String moviesSortOrder = getSortOrderPref();
+                if (mMovies == null && mContext.getResources().getString(R.string.pref_movies_sort_order_favorites).equals(moviesSortOrder)) {
+                    Realm realm = Realm.getDefaultInstance();
+                    mMovies = realm.copyFromRealm(realm.where(Movie.class).findAll());
+                }
                 mGridView.setAdapter(thisAdapter);
             }
         }.execute();
     }
 
     public int getCount() {
-        return mMovies != null ? mMovies.listOfMovies.size() : 0;
+        return mMovies != null ? mMovies.size() : 0;
     }
 
     public Object getItem(int position) {
-        return mMovies != null ? mMovies.listOfMovies.get(position) : null;
+        return mMovies != null ? mMovies.get(position) : null;
     }
 
     public long getItemId(int position) {
-        // TODO: is this needed?
+        // this must be implemented but we don't need it
         return 0;
     }
 
@@ -96,9 +109,8 @@ public class MainActivityFragmentImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        // TODO: set up actual image via another asynctask
         String posterPath = MoviesApiHelpers.getMoviesImageBaseUrl(
-                Integer.valueOf(width)) + "/" + mMovies.listOfMovies.get(position).poster_path;
+                Integer.valueOf(width)) + "/" + mMovies.get(position).poster_path;
         Picasso.with(mContext).load(posterPath).into(imageView);
         return imageView;
     }

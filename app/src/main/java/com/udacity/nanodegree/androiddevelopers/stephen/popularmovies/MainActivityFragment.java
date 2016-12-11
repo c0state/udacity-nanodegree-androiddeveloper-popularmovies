@@ -30,7 +30,7 @@ public class MainActivityFragment extends Fragment {
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Movie clickedMovie = imageAdapter.movies().listOfMovies.get(position);
+                Movie clickedMovie = imageAdapter.movies().get(position);
                 Intent intent = new Intent(getContext(), MovieDetailActivity.class);
                 intent.putExtra(getString(R.string.movie_detail_object), clickedMovie);
                 startActivity(intent);

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.squareup.picasso.Picasso;
+import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.GeneralHelpers;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Movie;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.MoviesApiHelpers;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Reviews;
@@ -31,9 +32,6 @@ import java.util.Locale;
 
 import io.realm.Realm;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MovieDetailActivityFragment extends Fragment {
     private Movie mMovie;
 
@@ -81,15 +79,17 @@ public class MovieDetailActivityFragment extends Fragment {
         TextView detailTitleText = (TextView)view.findViewById(R.id.id_movie_detail_title);
         detailTitleText.setText(mMovie.original_title);
 
+        int width = Integer.valueOf(getString(R.string.pref_movies_poster_width));
+        int height = Integer.valueOf(getString(R.string.pref_movies_poster_height));
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         final ImageView moviePosterView = (ImageView)view.findViewById(R.id.id_movie_detail_image);
+        // TODO: turn poster resize percentage into const
         moviePosterView.setLayoutParams(new LinearLayout.LayoutParams((int)(size.x/2*0.9),
-                (int)(size.x/2*0.9)*277/185));
+                (int)(size.x/2*0.9)*height/width));
         moviePosterView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        // TODO: const out the image width
         Picasso.with(view.getContext())
-                .load(MoviesApiHelpers.getMoviesImageBaseUrl(185) + "/" + mMovie.poster_path)
+                .load(MoviesApiHelpers.getMoviesImageBaseUrl(width) + "/" + mMovie.poster_path)
                 .into(moviePosterView);
 
         TextView yearText = (TextView)view.findViewById(R.id.id_movie_detail_year);
@@ -130,8 +130,7 @@ public class MovieDetailActivityFragment extends Fragment {
                             .getMovieVideos(mMovie.id, BuildConfig.THEMOVIESDB_API_KEY3)
                             .execute().body();
                 } catch (IOException ioe) {
-                    // TODO: const out error class name
-                    Log.e("DetailActivity", "Error invoking Api to get movie videos for movie id " + mMovie.id);
+                    Log.e(getClass().getSimpleName(), "Error invoking Api to get movie videos for movie id " + mMovie.id);
                 }
                 return null;
             }
@@ -141,7 +140,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 videosAdapter.addAll(videos.listOfVideos);
                 videosAdapter.notifyDataSetChanged();
                 // prevent scrolling in video listview
-                MoviesApiHelpers.setListViewHeightBasedOnChildren(videoListView);
+                GeneralHelpers.setListViewHeightBasedOnChildren(videoListView);
             }
         }.execute();
 
@@ -161,8 +160,7 @@ public class MovieDetailActivityFragment extends Fragment {
                             .getMovieReviews(mMovie.id, BuildConfig.THEMOVIESDB_API_KEY3)
                             .execute().body();
                 } catch (IOException ioe) {
-                    // TODO: const out error class name
-                    Log.e("DetailActivity", "Error invoking Api to get movie reviews for movie id " + mMovie.id);
+                    Log.e(getClass().getSimpleName(), "Error invoking Api to get movie reviews for movie id " + mMovie.id);
                 }
                 return null;
             }
@@ -172,7 +170,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 reviewsAdapter.addAll(reviews.listOfReviews);
                 reviewsAdapter.notifyDataSetChanged();
                 // prevent scrolling in review listview
-                MoviesApiHelpers.setListViewHeightBasedOnChildren(reviewListView);
+                GeneralHelpers.setListViewHeightBasedOnChildren(reviewListView);
             }
         }.execute();
 
