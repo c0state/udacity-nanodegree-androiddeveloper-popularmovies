@@ -2,9 +2,10 @@ package com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Movie {
+public class Movie implements Serializable {
 
     @SerializedName("id")
     public int id;
@@ -21,9 +22,9 @@ public class Movie {
     @SerializedName("release_date")
     public Date release_date;
 
-    public Movie(int id, String title, Date year) {
-        this.id = id;
-        this.original_title = title;
-        this.release_date = year;
-    }
+    @SerializedName("vote_average")
+    public double vote_average;
+
+    @SerializedName("runtime")
+    public int runtime;
 }

@@ -30,6 +30,10 @@ public class MainActivityFragmentImageAdapter extends BaseAdapter {
         getMovies();
     }
 
+    public Movies movies() {
+        return mMovies;
+    }
+
     private void getMovies() {
         final MoviesApi moviesApi = MoviesApiHelpers.getMoviesService();
         final ListAdapter thisAdapter = this;
