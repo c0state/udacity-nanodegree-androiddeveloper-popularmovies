@@ -14,4 +14,10 @@ public interface MoviesApi {
 
     @GET("3/movie/{id}")
     Call<Movie> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
+
+    @GET("3/movie/{id}/videos")
+    Call<Videos> getMovieVideos(@Path("id") int id, @Query("api_key") String apiKey);
+
+    @GET("3/movie/{id}/reviews")
+    Call<Reviews> getMovieReviews(@Path("id") int id, @Query("api_key") String apiKey);
 }
