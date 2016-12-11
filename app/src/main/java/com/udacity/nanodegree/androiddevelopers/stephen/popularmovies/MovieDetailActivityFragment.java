@@ -5,6 +5,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,9 +65,14 @@ public class MovieDetailActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        mMovie = (Movie)getActivity().getIntent().getSerializableExtra(getString(R.string.movie_detail_object));
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mMovie = (Movie)getActivity().getIntent().getSerializableExtra(getString(R.string.movie_detail_object));
         return inflater.inflate(R.layout.fragment_movie_detail, container, false);
     }
 
@@ -175,7 +181,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
         Realm realm = Realm.getDefaultInstance();
         Movie favoriteMovie = realm.where(Movie.class).equalTo("id", mMovie.id).findFirst();
-        favoriteButton.setFavorite(favoriteMovie != null);
+        favoriteButton.setFavorite(favoriteMovie != null, false);
 
         favoriteButton.setOnFavoriteChangeListener(
                 new MaterialFavoriteButton.OnFavoriteChangeListener() {

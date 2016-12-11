@@ -18,6 +18,9 @@ import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Movi
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.MoviesApiHelpers;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivityFragmentImageAdapter extends BaseAdapter {
     private Context mContext;
@@ -79,25 +82,23 @@ public class MainActivityFragmentImageAdapter extends BaseAdapter {
         return 0;
     }
 
-    // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO: const out the width/height
-        int width = 185;
-        int height = 277;
-
         ImageView imageView;
+        String width = mContext.getResources().getString(R.string.pref_movies_poster_width);
+        String height = mContext.getResources().getString(R.string.pref_movies_poster_height);
         if (convertView == null) {
-            // if it's not recycled, initialize some attributes
+            // if it's not recycled, reuse
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(mGridView.getColumnWidth(),
-                    mGridView.getColumnWidth()*height/width));
+                    mGridView.getColumnWidth()*Integer.valueOf(height)/Integer.valueOf(width)));
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         } else {
             imageView = (ImageView) convertView;
         }
 
         // TODO: set up actual image via another asynctask
-        String posterPath = MoviesApiHelpers.getMoviesImageBaseUrl(width) + "/" + mMovies.listOfMovies.get(position).poster_path;
+        String posterPath = MoviesApiHelpers.getMoviesImageBaseUrl(
+                Integer.valueOf(width)) + "/" + mMovies.listOfMovies.get(position).poster_path;
         Picasso.with(mContext).load(posterPath).into(imageView);
         return imageView;
     }
