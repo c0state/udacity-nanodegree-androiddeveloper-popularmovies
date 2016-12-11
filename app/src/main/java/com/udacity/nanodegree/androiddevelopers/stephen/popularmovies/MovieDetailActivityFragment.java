@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
 
+import io.realm.Realm;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -75,7 +77,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-        ImageView moviePosterView = (ImageView)view.findViewById(R.id.id_movie_detail_image);
+        final ImageView moviePosterView = (ImageView)view.findViewById(R.id.id_movie_detail_image);
         moviePosterView.setLayoutParams(new LinearLayout.LayoutParams((int)(size.x/2*0.9),
                 (int)(size.x/2*0.9)*277/185));
         moviePosterView.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -170,10 +172,33 @@ public class MovieDetailActivityFragment extends Fragment {
 
         // load favorites handler
         MaterialFavoriteButton favoriteButton = (MaterialFavoriteButton)view.findViewById(R.id.id_movie_detail_fav_button);
+
+        Realm realm = Realm.getDefaultInstance();
+        Movie favoriteMovie = realm.where(Movie.class).equalTo("id", mMovie.id).findFirst();
+        favoriteButton.setFavorite(favoriteMovie != null);
+
         favoriteButton.setOnFavoriteChangeListener(
                 new MaterialFavoriteButton.OnFavoriteChangeListener() {
                     @Override
                     public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                        Realm realm = Realm.getDefaultInstance();
+
+                        if (favorite) {
+                            if (realm.where(Movie.class).equalTo("id", mMovie.id).findAll().isEmpty()) {
+                                // add this movie to favorites
+                                realm.beginTransaction();
+                                realm.copyToRealm(mMovie);
+                                realm.commitTransaction();
+                            }
+                        } else {
+                            // remove movie from favorites
+                            realm.beginTransaction();
+                            realm.where(Movie.class)
+                                    .equalTo("id", mMovie.id)
+                                    .findAll()
+                                    .deleteAllFromRealm();
+                            realm.commitTransaction();
+                        }
                     }
                 });
     }
