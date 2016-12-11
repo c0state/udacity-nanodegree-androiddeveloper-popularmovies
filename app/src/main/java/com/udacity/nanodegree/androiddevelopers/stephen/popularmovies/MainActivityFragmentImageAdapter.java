@@ -12,7 +12,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 
-import com.google.common.collect.Lists;
 import com.squareup.picasso.Picasso;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Movie;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.MoviesApi;

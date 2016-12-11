@@ -82,6 +82,7 @@
     <string name="pref_movies_sort_order_favorites">favorites</string>
     <string name="pref_movies_poster_width">185</string>
     <string name="pref_movies_poster_height">277</string>
+    <string name="pref_movies_poster_scale_perc">0.9</string>
     <string name="title_activity_movie_detail">MovieDetailActivity</string>
 
     <string name="movie_detail_object">movie_detail_object</string>
