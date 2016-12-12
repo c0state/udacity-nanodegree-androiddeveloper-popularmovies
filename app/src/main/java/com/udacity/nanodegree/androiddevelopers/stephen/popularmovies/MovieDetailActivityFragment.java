@@ -190,17 +190,6 @@ public class MovieDetailActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        if (id == R.id.id_menu_action_share) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         // add share menu only if a video exists
@@ -227,12 +216,6 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_movie_detail, menu);
-        MenuItem item = menu.findItem(R.id.id_menu_action_share);
-        ShareActionProvider shareActionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(item);
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareActionProvider.setShareIntent(shareIntent);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
