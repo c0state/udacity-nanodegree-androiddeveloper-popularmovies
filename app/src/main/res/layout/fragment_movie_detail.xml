@@ -38,7 +38,7 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="16dp">
+                android:paddingTop="@dimen/fab_margin">
 
                 <LinearLayout
                     android:orientation="horizontal"
@@ -59,7 +59,7 @@
                         android:layout_width="0dip"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:padding="@dimen/fab_margin">
+                        android:paddingLeft="@dimen/fab_margin">
 
                         <TextView
                             android:text="TextView"
@@ -99,8 +99,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/id_movie_detail_synopsis"
                     android:layout_weight="1"
-                    android:padding="@dimen/fab_margin"
-                    android:textSize="14sp" />
+                    android:textSize="18sp"
+                    android:paddingTop="@dimen/fab_margin" />
 
             </LinearLayout>
 
