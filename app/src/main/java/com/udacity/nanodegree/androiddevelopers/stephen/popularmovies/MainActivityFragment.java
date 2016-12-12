@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
+import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.GeneralHelpers;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Movie;
 
 /**
@@ -33,7 +35,13 @@ public class MainActivityFragment extends Fragment {
                 Movie clickedMovie = imageAdapter.movies().get(position);
                 Intent intent = new Intent(getContext(), MovieDetailActivity.class);
                 intent.putExtra(getString(R.string.movie_detail_object), clickedMovie);
-                startActivity(intent);
+                if (GeneralHelpers.isOnline(getContext())) {
+                    startActivity(intent);
+                }
+                else {
+                    Toast.makeText(getContext(), "Network access required for movie details!",
+                            Integer.valueOf(getString(R.string.toast_seconds_default))).show();
+                }
             }
         });
 

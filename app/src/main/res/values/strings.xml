@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">PopularMovies</string>
     <string name="action_settings">Settings</string>
+
+    <!-- Activity Titles -->
+    <string name="title_activity_main">Popular Movies</string>
+    <string name="title_activity_movie_detail">Movie Details</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
@@ -75,6 +79,7 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
 
+    <!-- Strings related to movie preferences -->
     <string name="pref_movies_sort_order_key">pref_movies_sort_order_key</string>
     <string name="pref_movies_sort_order_default">popular</string>
     <string name="pref_movies_sort_order_popular">popular</string>
@@ -84,7 +89,7 @@
     <string name="pref_movies_poster_height">277</string>
     <string name="pref_movies_poster_scale_perc">0.9</string>
     <string name="pref_movies_runtime_suffix">minutes</string>
-    <string name="title_activity_movie_detail">MovieDetailActivity</string>
 
     <string name="movie_detail_object">movie_detail_object</string>
+    <string name="toast_seconds_default">3</string>
 </resources>
