@@ -3,20 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/ic_media_play"
-        android:id="@+id/id_trailer_image"
-        android:layout_weight="1" />
+        android:id="@+id/id_trailer_image" />
 
     <TextView
         android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
         android:id="@+id/id_trailer_text"
-        android:layout_weight="1"
-        android:textAlignment="textStart" />
+        android:gravity="center_vertical"
+        android:maxLines="1" />
 </LinearLayout>

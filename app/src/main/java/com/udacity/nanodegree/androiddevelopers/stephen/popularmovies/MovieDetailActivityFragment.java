@@ -56,7 +56,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
             @Override
             protected void onPostExecute(Integer integer) {
-                runtimeText.setText(Integer.toString(integer));
+                runtimeText.setText(Integer.toString(integer) + " " + getString(R.string.pref_movies_runtime_suffix));
                 super.onPostExecute(integer);
             }
         }.execute();
