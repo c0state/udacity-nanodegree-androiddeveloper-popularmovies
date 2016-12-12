@@ -8,14 +8,16 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/ic_media_play"
+        app:srcCompat="@mipmap/photo_video_start_icon"
         android:id="@+id/id_trailer_image" />
 
     <TextView
         android:text="TextView"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="match_parent"
         android:id="@+id/id_trailer_text"
         android:gravity="center_vertical"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:textStyle="normal|bold"
+        android:paddingLeft="8dp" />
 </LinearLayout>

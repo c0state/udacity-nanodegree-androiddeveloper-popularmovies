@@ -14,12 +14,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
 import com.squareup.picasso.Picasso;
-import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.GeneralHelpers;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Movie;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.MoviesApiHelpers;
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Reviews;
@@ -67,11 +66,11 @@ public class MovieDetailActivityFragment extends Fragment {
         final MovieDetailActivityFragmentVideosAdapter videosAdapter = new MovieDetailActivityFragmentVideosAdapter(
                 getContext(),
                 R.layout.fragment_movie_detail_video_listitem);
-        final ListView videoListView = (ListView)getView().findViewById(R.id.id_movie_detail_video_list);
-        videoListView.setAdapter(videosAdapter);
+        final ExpandableHeightListView videosView = (ExpandableHeightListView)getView().findViewById(R.id.id_movie_detail_video_list);
+        videosView.setAdapter(videosAdapter);
 
         // set up click listener on video listview to play video via intent
-        videoListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        videosView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Video item = videosAdapter.getItem(i);
@@ -99,10 +98,10 @@ public class MovieDetailActivityFragment extends Fragment {
             protected void onPostExecute(Videos videos) {
                 videosAdapter.addAll(videos.listOfVideos);
                 videosAdapter.notifyDataSetChanged();
-                // prevent scrolling in video listview
-                GeneralHelpers.setListViewHeightBasedOnChildren(videoListView);
             }
         }.execute();
+
+        videosView.setExpanded(true);
     }
 
     private void setUpReviewsListHandling() {
@@ -110,8 +109,8 @@ public class MovieDetailActivityFragment extends Fragment {
         final MovieDetailActivityFragmentReviewsAdapter reviewsAdapter = new MovieDetailActivityFragmentReviewsAdapter(
                 getContext(),
                 R.layout.fragment_movie_detail_review_listitem);
-        final ListView reviewListView = (ListView) getView().findViewById(R.id.id_movie_detail_review_list);
-        reviewListView.setAdapter(reviewsAdapter);
+        final ExpandableHeightListView reviewsView = (ExpandableHeightListView) getView().findViewById(R.id.id_movie_detail_review_list);
+        reviewsView.setAdapter(reviewsAdapter);
 
         // load reviews into reviews adapter
         new AsyncTask<Void, Void, Reviews>() {
@@ -131,10 +130,11 @@ public class MovieDetailActivityFragment extends Fragment {
             protected void onPostExecute(Reviews reviews) {
                 reviewsAdapter.addAll(reviews.listOfReviews);
                 reviewsAdapter.notifyDataSetChanged();
-                // prevent scrolling in review listview
-                GeneralHelpers.setListViewHeightBasedOnChildren(reviewListView);
             }
         }.execute();
+
+
+        reviewsView.setExpanded(true);
     }
 
     private void setUpFavoritesHandling() {

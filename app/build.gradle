@@ -40,6 +40,7 @@ dependencies {
     compile 'com.android.support:support-vector-drawable:25.0.1'
     compile 'com.facebook.stetho:stetho:1.4.1'
     compile 'com.github.ivbaranov:materialfavoritebutton:0.1.2'
+    compile 'com.github.paolorotolo:expandableheightlistview:1.0.0'
     testCompile 'junit:junit:4.12'
 }
 

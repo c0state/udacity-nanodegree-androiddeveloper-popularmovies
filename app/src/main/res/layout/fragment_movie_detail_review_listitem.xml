@@ -10,7 +10,8 @@
         android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:id="@+id/id_review_name"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:textStyle="normal|bold|italic" />
 
     <TextView
         android:text="TextView"
