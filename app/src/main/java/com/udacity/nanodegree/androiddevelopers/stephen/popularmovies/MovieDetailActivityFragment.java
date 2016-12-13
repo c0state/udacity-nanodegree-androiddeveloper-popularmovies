@@ -205,7 +205,7 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         // get movie object from parent activity that triggered this activity
-        mMovie = (Movie)getActivity().getIntent().getSerializableExtra(getString(R.string.movie_detail_object));
+        mMovie = getActivity().getIntent().getParcelableExtra(getString(R.string.movie_detail_object));
         super.onCreate(savedInstanceState);
     }
 
