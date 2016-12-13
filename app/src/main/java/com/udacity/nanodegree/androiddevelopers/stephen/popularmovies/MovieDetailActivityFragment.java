@@ -269,6 +269,8 @@ public class MovieDetailActivityFragment extends Fragment {
         moviePosterView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         Picasso.with(view.getContext())
                 .load(MoviesApiHelpers.getMoviesImageBaseUrl(width) + "/" + mMovie.poster_path)
+                .placeholder(R.drawable.poster_placeholder)
+                .error(R.drawable.poster_placeholder)
                 .into(moviePosterView);
 
         Calendar cal = Calendar.getInstance();

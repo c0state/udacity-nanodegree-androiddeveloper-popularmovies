@@ -110,7 +110,11 @@ public class MainActivityFragmentImageAdapter extends BaseAdapter {
 
         String posterPath = MoviesApiHelpers.getMoviesImageBaseUrl(
                 Integer.valueOf(width)) + "/" + mMovies.get(position).poster_path;
-        Picasso.with(mContext).load(posterPath).into(imageView);
+        Picasso.with(mContext)
+                .load(posterPath)
+                .placeholder(R.drawable.poster_placeholder)
+                .error(R.drawable.poster_placeholder)
+                .into(imageView);
         return imageView;
     }
 }
