@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
@@ -35,17 +34,31 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+import butterknife.Unbinder;
 import io.realm.Realm;
 
 public class MovieDetailActivityFragment extends Fragment {
     private Movie mMovie;
 
+    // butterknife bindings
+    @BindView(R.id.id_movie_detail_title) TextView detailTitleText;
+    @BindView(R.id.id_movie_detail_runtime) TextView runtimeText;
+    @BindView(R.id.id_movie_detail_video_list) ExpandableHeightListView videosView;
+    @BindView(R.id.id_movie_detail_review_list) ExpandableHeightListView reviewsView;
+    @BindView(R.id.id_movie_detail_fav_button) MaterialFavoriteButton favoriteButton;
+    @BindView(R.id.id_movie_detail_image) ImageView moviePosterView;
+    @BindView(R.id.id_movie_detail_year) TextView yearText;
+    @BindView(R.id.id_movie_detail_synopsis) TextView synopsisText;
+    @BindView(R.id.id_movie_detail_rating) TextView ratingText;
+    Unbinder unbinder;
+
     public MovieDetailActivityFragment() {
     }
 
     private void getMovieRuntime(final Movie targetMovie) {
-        final TextView runtimeText = (TextView)getView().findViewById(R.id.id_movie_detail_runtime);
-
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
@@ -61,10 +74,25 @@ public class MovieDetailActivityFragment extends Fragment {
 
             @Override
             protected void onPostExecute(Integer integer) {
+                if (getActivity() == null) {
+                    return;
+                }
+
                 runtimeText.setText(Integer.toString(integer) + " " + getString(R.string.pref_movies_runtime_suffix));
                 super.onPostExecute(integer);
             }
         }.execute();
+    }
+
+
+    @OnItemClick(R.id.id_movie_detail_video_list)
+    void videosListItemClickHandler(AdapterView<?> adapterView, View view, int i, long l) {
+        // set up click listener on video listview to play video via intent
+        Video item = (Video)adapterView.getAdapter().getItem(i);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(getString(R.string.youtube_video_url_prefix) + item.key));
+        startActivity(intent);
     }
 
     private void setUpVideosListHandling() {
@@ -72,20 +100,7 @@ public class MovieDetailActivityFragment extends Fragment {
         final MovieDetailActivityFragmentVideosAdapter videosAdapter =
                 new MovieDetailActivityFragmentVideosAdapter(getContext(),
                         R.layout.fragment_movie_detail_video_listitem);
-        final ExpandableHeightListView videosView = (ExpandableHeightListView)getView()
-                .findViewById(R.id.id_movie_detail_video_list);
         videosView.setAdapter(videosAdapter);
-
-        // set up click listener on video listview to play video via intent
-        videosView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Video item = videosAdapter.getItem(i);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + item.key));
-                startActivity(intent);
-            }
-        });
 
         // get videos for this movie and add to videos listadapter
         new AsyncTask<Void, Void, Videos>() {
@@ -103,10 +118,14 @@ public class MovieDetailActivityFragment extends Fragment {
 
             @Override
             protected void onPostExecute(Videos videos) {
+                // if we have at least one video, enable share menu, but make sure activity is alive
+                if (getActivity() == null) {
+                    return;
+                }
+
                 videosAdapter.addAll(videos.listOfVideos);
                 videosAdapter.notifyDataSetChanged();
 
-                // if we have at least one video, enable share menu
                 getActivity().invalidateOptionsMenu();
             }
         }.execute();
@@ -116,11 +135,9 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private void setUpReviewsListHandling() {
         // set up reviews adapter and attach to reviews list
-        final MovieDetailActivityFragmentReviewsAdapter reviewsAdapter = new MovieDetailActivityFragmentReviewsAdapter(
-                getContext(),
-                R.layout.fragment_movie_detail_review_listitem);
-        final ExpandableHeightListView reviewsView = (ExpandableHeightListView) getView()
-                .findViewById(R.id.id_movie_detail_review_list);
+        final MovieDetailActivityFragmentReviewsAdapter reviewsAdapter =
+                new MovieDetailActivityFragmentReviewsAdapter(getContext(),
+                        R.layout.fragment_movie_detail_review_listitem);
         reviewsView.setAdapter(reviewsAdapter);
 
         // load reviews into reviews adapter
@@ -132,13 +149,18 @@ public class MovieDetailActivityFragment extends Fragment {
                             .getMovieReviews(mMovie.id, BuildConfig.THEMOVIESDB_API_KEY3)
                             .execute().body();
                 } catch (IOException ioe) {
-                    Log.e(getClass().getSimpleName(), "Error invoking Api to get movie reviews for movie id " + mMovie.id);
+                    Log.e(getClass().getSimpleName(),
+                            "Error invoking Api to get movie reviews for movie id " + mMovie.id);
                 }
                 return null;
             }
 
             @Override
             protected void onPostExecute(Reviews reviews) {
+                if (getActivity() == null) {
+                    return;
+                }
+
                 reviewsAdapter.addAll(reviews.listOfReviews);
                 reviewsAdapter.notifyDataSetChanged();
             }
@@ -149,9 +171,6 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private void setUpFavoritesHandling() {
         // load favorites handler
-        MaterialFavoriteButton favoriteButton = (MaterialFavoriteButton)getView()
-                .findViewById(R.id.id_movie_detail_fav_button);
-
         Realm realm = Realm.getDefaultInstance();
         Movie favoriteMovie = realm.where(Movie.class).equalTo("id", mMovie.id).findFirst();
         favoriteButton.setFavorite(favoriteMovie != null, false);
@@ -191,19 +210,26 @@ public class MovieDetailActivityFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         // add share menu only if a video exists
-        ListView videos = (ListView)getView().findViewById(R.id.id_movie_detail_video_list);
-        Video firstVideo = videos.getAdapter().getCount() > 0
-                ? (Video)videos.getAdapter().getItem(0)
+        Video firstVideo = videosView.getAdapter().getCount() > 0
+                ? (Video)videosView.getAdapter().getItem(0)
                 : null;
 
         if (firstVideo != null) {
             MenuItem item = menu.findItem(R.id.id_menu_action_share);
-            ShareActionProvider shareActionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(item);
+            ShareActionProvider shareActionProvider =
+                    (ShareActionProvider)MenuItemCompat.getActionProvider(item);
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + firstVideo.key);
+            shareIntent.putExtra(Intent.EXTRA_TEXT,
+                    getString(R.string.youtube_video_url_prefix) + firstVideo.key);
             shareActionProvider.setShareIntent(shareIntent);
         }
         else {
@@ -223,39 +249,36 @@ public class MovieDetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+        return rootView;
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        TextView detailTitleText = (TextView)view.findViewById(R.id.id_movie_detail_title);
         detailTitleText.setText(mMovie.original_title);
 
         int width = Integer.valueOf(getString(R.string.pref_movies_poster_width));
         int height = Integer.valueOf(getString(R.string.pref_movies_poster_height));
-        double posterScalePerc = Double.valueOf(getString(R.string.pref_movies_poster_scale_perc));
+        double posterScalePercentage = Double.valueOf(getString(R.string.pref_movies_poster_scale_perc));
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-        final ImageView moviePosterView = (ImageView)view.findViewById(R.id.id_movie_detail_image);
         moviePosterView.setLayoutParams(
-                new LinearLayout.LayoutParams((int)(size.x/2*posterScalePerc),
-                (int)(size.x/2*posterScalePerc)*height/width));
+                new LinearLayout.LayoutParams((int)(size.x/2*posterScalePercentage),
+                (int)(size.x/2*posterScalePercentage)*height/width));
         moviePosterView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         Picasso.with(view.getContext())
                 .load(MoviesApiHelpers.getMoviesImageBaseUrl(width) + "/" + mMovie.poster_path)
                 .into(moviePosterView);
 
-        TextView yearText = (TextView)view.findViewById(R.id.id_movie_detail_year);
         Calendar cal = Calendar.getInstance();
         cal.setTime(mMovie.release_date);
         yearText.setText(String.format(Locale.getDefault(), "%4d", cal.get(Calendar.YEAR)));
 
         getMovieRuntime(mMovie);
 
-        TextView synopsisText = (TextView)view.findViewById(R.id.id_movie_detail_synopsis);
         synopsisText.setText(mMovie.overview);
 
-        TextView ratingText = (TextView)view.findViewById(R.id.id_movie_detail_rating);
         ratingText.setText(String.format(Locale.getDefault(), "%1.1f", mMovie.vote_average));
 
         setUpVideosListHandling();

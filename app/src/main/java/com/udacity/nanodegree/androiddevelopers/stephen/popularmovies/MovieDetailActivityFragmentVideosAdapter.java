@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import com.udacity.nanodegree.androiddevelopers.stephen.popularmovies.utils.Video;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MovieDetailActivityFragmentVideosAdapter extends ArrayAdapter<Video> {
     private Context mContext;
     private int layoutResourceId;
@@ -28,9 +31,7 @@ public class MovieDetailActivityFragmentVideosAdapter extends ArrayAdapter<Video
             LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
 
-            videoHolder = new VideoHolder();
-            videoHolder.videoText = (TextView)row.findViewById(R.id.id_trailer_text);
-
+            videoHolder = new VideoHolder(row);
             row.setTag(videoHolder);
         } else {
             videoHolder = (VideoHolder)row.getTag();
@@ -42,9 +43,15 @@ public class MovieDetailActivityFragmentVideosAdapter extends ArrayAdapter<Video
         return row;
     }
 
-    public static class VideoHolder
+    static class VideoHolder
     {
+        @BindView(R.id.id_trailer_image)
         ImageView videoPlayIcon;
+        @BindView(R.id.id_trailer_text)
         TextView videoText;
+
+        VideoHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }

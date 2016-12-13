@@ -93,4 +93,5 @@
 
     <string name="movie_detail_object">movie_detail_object</string>
     <string name="toast_seconds_default">3</string>
+    <string name="youtube_video_url_prefix">http://www.youtube.com/watch?v=</string>
 </resources>
